@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExceptionHandler", "ExceptionHandler\ExceptionHandler.csproj", "{AB0C5522-BA88-40EC-8F67-667F406E9B8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExceptionHandler.Tests", "ExceptionHandler.Tests\ExceptionHandler.Tests.csproj", "{5A37B8B4-4A1A-4BD7-83BA-78E6E4672291}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB0C5522-BA88-40EC-8F67-667F406E9B8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB0C5522-BA88-40EC-8F67-667F406E9B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB0C5522-BA88-40EC-8F67-667F406E9B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB0C5522-BA88-40EC-8F67-667F406E9B8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A37B8B4-4A1A-4BD7-83BA-78E6E4672291}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A37B8B4-4A1A-4BD7-83BA-78E6E4672291}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A37B8B4-4A1A-4BD7-83BA-78E6E4672291}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A37B8B4-4A1A-4BD7-83BA-78E6E4672291}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

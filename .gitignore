@@ -1,0 +1,7 @@
+Flatfoot.v11.suo
+ExceptionHandler/*.ncrunch*
+ExceptionHandler/bin
+ExceptionHandler/obj
+ExceptionHandler.Tests/*.ncrunch*
+ExceptionHandler.Tests/bin
+ExceptionHandler.Tests/obj
