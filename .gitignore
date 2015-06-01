@@ -1,7 +1,19 @@
-Flatfoot.v11.suo
-ExceptionHandler/*.ncrunch*
-ExceptionHandler/bin
-ExceptionHandler/obj
-ExceptionHandler.Tests/*.ncrunch*
-ExceptionHandler.Tests/bin
-ExceptionHandler.Tests/obj
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
+
+# Nuget
+packages/

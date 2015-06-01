@@ -8,6 +8,24 @@ namespace ExceptionHandler.ScreenShot
     public class ScreenCapture
     {
         /// <summary>
+        /// For transparent windows use: GDI32.CAPTUREBLT | GDI32.SRCCOPY;
+        /// </summary>
+        private static uint _dwRop = GDI32.SRCCOPY;
+        private static bool _useTransparentRasterOp = false;
+        /// <summary>
+        /// Flag for the raster operation for the screen capture
+        /// </summary>
+        public static bool UseTransparentRasterOp
+        {
+            get { return _useTransparentRasterOp; }
+            set
+            {
+                if (value) _dwRop = GDI32.CAPTUREBLT | GDI32.SRCCOPY;
+                else _dwRop = GDI32.SRCCOPY;
+                _useTransparentRasterOp = value;
+            }
+        }
+        /// <summary>
         /// Creates an Image object containing a screen shot of the entire desktop
         /// </summary>
         /// <returns></returns>
@@ -37,10 +55,10 @@ namespace ExceptionHandler.ScreenShot
             // select the bitmap object
             IntPtr hOld = GDI32.SelectObject(hdcDest, hBitmap);
             // bitblt over
-            GDI32.BitBlt(hdcDest, 0, 0, width, height, hdcSrc, 0, 0, GDI32.SRCCOPY);
+            GDI32.BitBlt(hdcDest, 0, 0, width, height, hdcSrc, 0, 0, _dwRop);
             // restore selection
             GDI32.SelectObject(hdcDest, hOld);
-            // clean up 
+            // clean up
             GDI32.DeleteDC(hdcDest);
             User32.ReleaseDC(handle, hdcSrc);
             // get a .NET image object for it
@@ -76,12 +94,12 @@ namespace ExceptionHandler.ScreenShot
         /// </summary>
         private class GDI32
         {
-
-            public const int SRCCOPY = 0x00CC0020; // BitBlt dwRop parameter
+            public const uint CAPTUREBLT = 0x40000000;
+            public const uint SRCCOPY = 0x00CC0020; // BitBlt dwRop parameter
             [DllImport("gdi32.dll")]
             public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest,
                 int nWidth, int nHeight, IntPtr hObjectSource,
-                int nXSrc, int nYSrc, int dwRop);
+                int nXSrc, int nYSrc, uint dwRop);
             [DllImport("gdi32.dll")]
             public static extern IntPtr CreateCompatibleBitmap(IntPtr hDC, int nWidth,
                 int nHeight);

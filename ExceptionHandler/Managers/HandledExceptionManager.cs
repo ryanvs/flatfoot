@@ -60,11 +60,11 @@ namespace ExceptionHandler.Managers
 
         public void ShowDialog(string strWhatHappened, string strHowUserAffected, string strWhatUserCanDo, string strMoreDetails="")
         {
-            _exceptionDialog.Text = _exceptionDialog.Text;
-            _exceptionDialog.ErrorBox.Text = strWhatHappened;
-            _exceptionDialog.ScopeBox.Text = strHowUserAffected;
-            _exceptionDialog.ActionBox.Text = strWhatUserCanDo;
-            _exceptionDialog.TxtMore.Text = strMoreDetails;
+            _exceptionDialog.Text = _exceptionMessageBuilder.ReplaceStringVals(_exceptionDialog.Text);
+            _exceptionDialog.ErrorBox.Text = _exceptionMessageBuilder.ReplaceStringVals(strWhatHappened);
+            _exceptionDialog.ScopeBox.Text = _exceptionMessageBuilder.ReplaceStringVals(strHowUserAffected);
+            _exceptionDialog.ActionBox.Text = _exceptionMessageBuilder.ReplaceStringVals(strWhatUserCanDo);
+            _exceptionDialog.TxtMore.Text = _exceptionMessageBuilder.ReplaceStringVals(strMoreDetails);
             _exceptionDialog.Button1.Visible = false;
             _exceptionDialog.Button2.Visible = false;
             _exceptionDialog.Button3.Text = "OK";

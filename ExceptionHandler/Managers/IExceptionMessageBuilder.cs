@@ -8,5 +8,6 @@ namespace ExceptionHandler.Managers
         string SystemInfo();
         string ExceptionInfo(Exception exception);
         string FormatExceptionForUser(string screenshotStatusMessage, string logToFileStatusMessage, string strException);
+        string ReplaceStringVals(string input);
     }
 }

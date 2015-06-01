@@ -5,8 +5,25 @@ namespace ExceptionHandler.Mail
 {
 
 
-    public class PostalWorker : IPostalWorker
+    public class OutlookPostalWorker : IPostalWorker
     {
+        public bool CanCreateMessage
+        {
+            get
+            {
+                try
+                {
+                    var app = new Application();
+                    var mail = app.CreateItem(OlItemType.olMailItem);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
         #region IPostalWorker Members
 
         public void SendMail(IMailMessage mailMessage)
@@ -14,8 +31,7 @@ namespace ExceptionHandler.Mail
             var app = new Application();
             var mail = app.CreateItem(OlItemType.olMailItem);
             mail.Body = mailMessage.Body;
-            mail.Recipients.Add("somebody@nobody.com");
-            mail.Recipients.Add("somebody@nobody.com");
+            mailMessage.To.ForEach(x => mail.Recipients.Add(x));
             mailMessage.AttachmentPaths.ForEach(x => mail.Attachments.Add(x));
             mail.Subject = mailMessage.Subject;
             mail.Send();

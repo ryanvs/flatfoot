@@ -28,6 +28,19 @@ namespace ExceptionHandler.Managers
         private readonly IAppKiller _appKiller;
         private static readonly ILog Logger = LogManager.GetLogger(typeof (UnhandledExceptionManager));
 
+        #region Properties
+        public bool DisplayDialog { get; set; }
+        public bool EmailScreenshot { get; set; }
+        public bool IgnoreDebugErrors { get; set; }
+        public bool IsConsoleApp { get; set; }
+        public bool LogToEventLog { get; set; }
+        public bool LogToFile { get; set; }
+        public bool KillAppOnException { get; set; }
+        public bool SendEmail { get; set; }
+        public bool TakeScreenshot { get; set; }
+        public System.Drawing.Imaging.ImageFormat ScreenshotImageFormat { get; set; }
+        #endregion
+
         public UnhandledExceptionManager(IExceptionNotification exceptionNotification, IAppKiller appKiller)
         {
             _exceptionNotification = exceptionNotification;
@@ -37,11 +50,28 @@ namespace ExceptionHandler.Managers
 
         public void AddHandler()
         {
-            if (AppSettings.DebugMode) return;
+            LoadConfigSettings();
+
+            if (IgnoreDebugErrors)
+            {
+                if (AppSettings.DebugMode) return;
+            }
 
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.Automatic);
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
             Application.ThreadException += ThreadExceptionHandler;
+        }
+
+        internal void LoadConfigSettings()
+        {
+            SendEmail = GetConfigBoolean("SendEmail", true);
+            TakeScreenshot = GetConfigBoolean("TakeScreenshot", true);
+            EmailScreenshot = GetConfigBoolean("EmailScreenshot", true);
+            LogToEventLog = GetConfigBoolean("LogToEventLog", false);
+            LogToFile = GetConfigBoolean("LogToFile", true);
+            DisplayDialog = GetConfigBoolean("DisplayDialog", true);
+            IgnoreDebugErrors = GetConfigBoolean("IgnoreDebug", true);
+            KillAppOnException = GetConfigBoolean("KillAppOnException", true);
         }
 
         internal void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
@@ -71,24 +101,102 @@ namespace ExceptionHandler.Managers
                 _exceptionNotification.BuildExceptionMessage(exception, "");
             }
 
-            Cursor.Current = Cursors.WaitCursor;
+            if (!IsConsoleApp) Cursor.Current = Cursors.WaitCursor;
 
             try
             {
-                _exceptionNotification.TakeScreenshot();
-                _exceptionNotification.WriteToLog();
-                _exceptionNotification.SendEmail(new MailMessage());
+                if (TakeScreenshot) _exceptionNotification.TakeScreenshot();
+                if (LogToEventLog) _exceptionNotification.WriteToEventLog();
+                if (LogToFile) _exceptionNotification.WriteToLog();
+                if (SendEmail) _exceptionNotification.SendEmail(new MailMessage());
             }
-                // ReSharper disable EmptyGeneralCatchClause
+            // ReSharper disable EmptyGeneralCatchClause
             catch (Exception e)
             {
                 Logger.Error("Exception thrown while trying to send mail: " + e);
             }
             // ReSharper restore EmptyGeneralCatchClause
 
-            Cursor.Current = Cursors.Default;
+            if (!IsConsoleApp) Cursor.Current = Cursors.Default;
+
+            // Display message to the user
             _exceptionNotification.CreateAndOpenExceptionUI();
-            _appKiller.Kill();
+
+            if (KillAppOnException)
+            {
+                _appKiller.Kill();
+            }
         }
+
+        #region Configuration details - TODO: refactor...
+        private const string _strClassName = "UnhandledExceptionManager";
+        private const string _strKeyNotPresent = "The key <{0}> is not present in the <appSettings> section of .config file";
+        private const string _strKeyError = "Error {0} retrieving key <{1}> from <appSettings> section of .config file";
+
+        //--
+        //-- Returns the specified String value from the application .config file,
+        //-- with many fail-safe checks (exceptions, key not present, etc)
+        //--
+        //-- this is important in an *unhandled exception handler*, because any unhandled exceptions will simply exit!
+        //-- 
+        internal static string GetConfigString(string strKey, string strDefault = null)
+        {
+            try
+            {
+                string strTemp = System.Configuration.ConfigurationManager.AppSettings.Get(_strClassName + "/" + strKey);
+                if (strTemp == null)
+                {
+                    if (strDefault == null)
+                        return string.Format(_strKeyNotPresent, _strClassName + "/" + strKey);
+                    else
+                        return strDefault;
+                }
+                else
+                    return strTemp;
+            }
+            catch (Exception ex)
+            {
+                if (strDefault == null)
+                    return string.Format(_strKeyError, ex.Message, _strClassName + "/" + strKey);
+                else
+                    return strDefault;
+            }
+        }
+
+        //--
+        //-- Returns the specified boolean value from the application .config file,
+        //-- with many fail-safe checks (exceptions, key not present, etc)
+        //--
+        //-- this is important in an *unhandled exception handler*, because any unhandled exceptions will simply exit!
+        //-- 
+        internal static bool GetConfigBoolean(string strKey, bool? blnDefault = null)
+        {
+            string strTemp;
+            try
+            {
+                strTemp = System.Configuration.ConfigurationManager.AppSettings.Get(_strClassName + "/" + strKey);
+            }
+            catch
+            {
+                return blnDefault.GetValueOrDefault(false);
+            }
+
+            if (strTemp == null)
+            {
+                return blnDefault.GetValueOrDefault(false);
+            }
+            else
+            {
+                switch (strTemp.ToLower())
+                {
+                    case "1":
+                    case "true":
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+        #endregion
     }
 }

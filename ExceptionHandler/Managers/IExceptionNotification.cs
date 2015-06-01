@@ -6,6 +6,7 @@ namespace ExceptionHandler.Managers
     public interface IExceptionNotification
     {
         void TakeScreenshot();
+        void WriteToEventLog();
         void WriteToLog();
         void SendEmail(MailMessage message);
         void CreateAndOpenExceptionUI();
